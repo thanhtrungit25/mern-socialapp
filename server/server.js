@@ -1,5 +1,17 @@
 import config from '../config/config';
 import app from './express';
+import mongoose from 'mongoose';
+
+mongoose.Promise = global.Promise;
+mongoose.connect(config.mongoURI, {
+  useNewUrlParser: true,
+  useCreateIndex: true,
+  useUnifiedTopology: true,
+});
+
+mongoose.connection.on('error', () => {
+  throw new Error(`unable to connect to database: ${config.mongoURI}`);
+});
 
 app.listen(config.port, function onStart(err) {
   if (err) {
