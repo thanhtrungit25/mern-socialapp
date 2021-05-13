@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@hot-loader/react-dom": "16.13.0",
+    "@material-ui/core": "^4.11.4",
+    "@material-ui/icons": "^4.11.2",
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
     "express": "^4.17.1",
@@ -21,13 +23,16 @@
     "mongoose": "^5.12.8",
     "react": "16.13.1",
     "react-dom": "16.13.1",
-    "react-hot-loader": "4.12.20"
+    "react-hot-loader": "4.12.20",
+    "react-router": "^5.2.0",
+    "react-router-dom": "^5.2.0"
   },
   "devDependencies": {
     "@babel/core": "7.9.0",
     "@babel/preset-env": "7.9.0",
     "@babel/preset-react": "7.9.4",
     "babel-loader": "8.1.0",
+    "file-loader": "^6.2.0",
     "nodemon": "2.0.2",
     "webpack": "4.42.1",
     "webpack-cli": "3.3.11",
