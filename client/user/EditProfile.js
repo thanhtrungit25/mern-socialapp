@@ -43,6 +43,7 @@ const EditProfile = ({ match }) => {
   const classes = useStyles();
   const [values, setValues] = useState({
     name: '',
+    about: '',
     email: '',
     password: '',
     error: '',
@@ -81,6 +82,7 @@ const EditProfile = ({ match }) => {
     const jwt = auth.isAuthenticated();
     const user = {
       name: values.name || undefined,
+      about: values.about || undefined,
       email: values.email || undefined,
       password: values.password || undefined,
     };
@@ -123,6 +125,16 @@ const EditProfile = ({ match }) => {
             className={classes.textField}
             value={values.name}
             onChange={handleChange('name')}
+          />
+          <br />
+          <TextField
+            id='about'
+            type='about'
+            label='About'
+            margin='normal'
+            className={classes.textField}
+            value={values.about}
+            onChange={handleChange('about')}
           />
           <br />
           <TextField

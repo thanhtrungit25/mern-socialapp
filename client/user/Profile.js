@@ -66,6 +66,8 @@ const Profile = ({ match }) => {
     return <Redirect to='/signin' />;
   }
 
+  console.log(user);
+
   return (
     <Paper elevation={4} className={classes.root}>
       <Typography variant='h6' className={classes.title}>
@@ -94,7 +96,8 @@ const Profile = ({ match }) => {
         <Divider />
         <ListItem>
           <ListItemText
-            primary={'Joined ' + new Date(user.created).toDateString()}
+            primary={user.about}
+            secondary={'Joined ' + new Date(user.created).toDateString()}
           />
         </ListItem>
       </List>
