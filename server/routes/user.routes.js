@@ -19,4 +19,14 @@ router
 
 router.param('userId', userCtrl.userByID);
 
+router
+  .route('/api/users/follow')
+  .put(authCtrl.requireSignin, userCtrl.addFollowing, userCtrl.addFollower);
+router
+  .route('/api/users/unfollow')
+  .put(
+    authCtrl.requireSignin,
+    userCtrl.removeFollowing,
+    userCtrl.removeFollower
+  );
 export default router;
