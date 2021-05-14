@@ -10,7 +10,7 @@ import {
   Paper,
   Typography,
 } from '@material-ui/core';
-import { Edit, Person, Delete } from '@material-ui/icons';
+import { Edit } from '@material-ui/icons';
 import React, { useEffect, useState } from 'react';
 import { Redirect } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
@@ -30,6 +30,11 @@ const useStyles = makeStyles((theme) => ({
   title: {
     marginTop: theme.spacing(3),
     color: theme.palette.protectedTitle,
+  },
+  bigAvatar: {
+    width: 60,
+    height: 60,
+    margin: 10,
   },
 }));
 
@@ -68,6 +73,10 @@ const Profile = ({ match }) => {
 
   console.log(user);
 
+  const photoUrl = user._id
+    ? `/api/users/photo/${user._id}?${new Date().getTime()}`
+    : '/api/users/defaultphoto';
+
   return (
     <Paper elevation={4} className={classes.root}>
       <Typography variant='h6' className={classes.title}>
@@ -76,9 +85,7 @@ const Profile = ({ match }) => {
       <List>
         <ListItem>
           <ListItemAvatar>
-            <Avatar>
-              <Person />
-            </Avatar>
+            <Avatar src={photoUrl} className={classes.bigAvatar} />
           </ListItemAvatar>
           <ListItemText primary={user.name} secondary={user.email} />
           {auth.isAuthenticated().user &&

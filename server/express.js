@@ -34,6 +34,7 @@ const CURRENT_WORKING_DIR = process.cwd();
 app.use('/dist', express.static(path.join(CURRENT_WORKING_DIR, 'dist')));
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(helmet());
 app.use(cors());
@@ -76,7 +77,6 @@ app.use((err, req, res, next) => {
     res.status(401).json({ error: `${err.name}: ${err.message}` });
   } else if (err) {
     res.status(400).json({ error: `${err.name}: ${err.message}` });
-    console.log(err);
   }
 });
 

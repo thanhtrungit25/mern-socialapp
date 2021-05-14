@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
+  Avatar,
   Button,
   Card,
   CardActions,
@@ -12,6 +13,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { Redirect } from 'react-router';
 import auth from '../auth/auth-helper';
 import { read, update } from './api-user';
+import FileUploadIcon from '@material-ui/icons/AddPhotoAlternate';
 
 const useStyles = makeStyles((theme) => ({
   card: {
@@ -37,23 +39,36 @@ const useStyles = makeStyles((theme) => ({
     margin: 'auto',
     marginBottom: theme.spacing(2),
   },
+  bigAvatar: {
+    width: 60,
+    height: 60,
+    margin: 'auto',
+  },
+  input: {
+    display: 'none',
+  },
+  filename: {
+    marginLeft: 10,
+  },
 }));
 
 const EditProfile = ({ match }) => {
   const classes = useStyles();
   const [values, setValues] = useState({
+    id: '',
     name: '',
     about: '',
+    photo: '',
     email: '',
     password: '',
     error: '',
     redirectToProfile: false,
   });
+  const jwt = auth.isAuthenticated();
 
   useEffect(() => {
     const abortController = new AbortController();
     const signal = abortController.signal;
-    const jwt = auth.isAuthenticated();
 
     read(
       {
@@ -65,7 +80,13 @@ const EditProfile = ({ match }) => {
       if (data && data.error) {
         setValues({ ...values, error: data.error });
       } else {
-        setValues({ ...values, name: data.name, email: data.email });
+        setValues({
+          ...values,
+          id: data._id,
+          name: data.name,
+          about: data.about,
+          email: data.email,
+        });
       }
     });
 
@@ -75,23 +96,24 @@ const EditProfile = ({ match }) => {
   }, [match.params.userId]);
 
   const handleChange = (name) => (event) => {
-    setValues({ ...values, [name]: event.target.value });
+    const value = name === 'photo' ? event.target.files[0] : event.target.value;
+    setValues({ ...values, [name]: value });
   };
 
   const clickSubmit = () => {
-    const jwt = auth.isAuthenticated();
-    const user = {
-      name: values.name || undefined,
-      about: values.about || undefined,
-      email: values.email || undefined,
-      password: values.password || undefined,
-    };
+    let userData = new FormData();
+    values.name && userData.append('name', values.name);
+    values.email && userData.append('email', values.email);
+    values.about && userData.append('about', values.about);
+    values.password && userData.append('password', values.password);
+    values.photo && userData.append('photo', values.photo);
+
     update(
       {
         userId: match.params.userId,
       },
       { t: jwt.token },
-      user
+      userData
     ).then((data) => {
       if (data && data.error) {
         setValues({ ...values, error: data.error });
@@ -110,6 +132,10 @@ const EditProfile = ({ match }) => {
     return <Redirect to={`/user/${values.userId}`} />;
   }
 
+  const photoUrl = values.id
+    ? `/api/users/photo/${values.id}?${new Date().getTime()}`
+    : '/api/users/defaultphoto';
+
   return (
     <div>
       <Card className={classes.card}>
@@ -117,9 +143,30 @@ const EditProfile = ({ match }) => {
           <Typography variant='h6' className={classes.title}>
             Edit Profile
           </Typography>
+          <Avatar src={photoUrl} className={classes.bigAvatar} />
+          <input
+            accept='image/*'
+            onChange={handleChange('photo')}
+            type='file'
+            className={classes.input}
+            id='icon-button-file'
+          />
+          <label htmlFor='icon-button-file'>
+            <Button
+              style={{ marginTop: 10 }}
+              variant='contained'
+              color='default'
+              component='span'
+            >
+              Upload <FileUploadIcon />
+            </Button>
+          </label>
+          <span className={classes.filename}>
+            {values.photo ? values.photo.name : ''}
+          </span>
+          <br />
           <TextField
             id='name'
-            type='name'
             label='Name'
             margin='normal'
             className={classes.textField}
@@ -129,7 +176,6 @@ const EditProfile = ({ match }) => {
           <br />
           <TextField
             id='about'
-            type='about'
             label='About'
             margin='normal'
             className={classes.textField}

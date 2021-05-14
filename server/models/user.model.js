@@ -18,6 +18,10 @@ const UserSchema = new mongoose.Schema({
     type: String,
     trim: true,
   },
+  photo: {
+    data: Buffer,
+    contentType: String,
+  },
   created: {
     type: Date,
     default: Date.now,
@@ -42,11 +46,7 @@ UserSchema.virtual('password')
 
 UserSchema.methods = {
   authenticate: function (plainText) {
-    console.log('-------');
-    console.log(this.hashed_password);
     const passwordedEncrypt = this.encryptPassword(plainText);
-    console.log(passwordedEncrypt);
-    console.log('-------');
     return this.encryptPassword(plainText) === this.hashed_password;
   },
   encryptPassword: function (password) {
