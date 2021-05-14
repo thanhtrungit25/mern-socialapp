@@ -19,6 +19,8 @@ import { Link } from 'react-router-dom';
 import { read } from './api-user';
 import DeleteUser from './DeleteUser';
 import FollowProfileButton from './FollowProfileButton';
+import FollowGrid from './FollowGrid';
+import ProfileTabs from './ProfileTabs';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -29,7 +31,7 @@ const useStyles = makeStyles((theme) => ({
     marginTop: theme.spacing(5),
   },
   title: {
-    marginTop: theme.spacing(3),
+    margin: `${theme.spacing(2)}px ${theme.spacing(1)}px 0`,
     color: theme.palette.protectedTitle,
   },
   bigAvatar: {
@@ -149,6 +151,8 @@ const Profile = ({ match }) => {
             secondary={'Joined ' + new Date(values.user.created).toDateString()}
           />
         </ListItem>
+        <Divider />
+        <ProfileTabs user={values.user} />
       </List>
     </Paper>
   );

@@ -1,5 +1,4 @@
 import React from 'react';
-import { makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
@@ -10,15 +9,6 @@ import { withRouter } from 'react-router';
 import { Link } from 'react-router-dom';
 import auth from '../auth/auth-helper';
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    flexGrow: 1,
-  },
-  menuButton: {
-    marginRight: theme.spacing(2),
-  },
-}));
-
 const isActive = (history, path) => {
   if (history.location.pathname === path) {
     return { color: '#ff4081' };
@@ -28,9 +18,6 @@ const isActive = (history, path) => {
 };
 
 const Menu = withRouter(({ history }) => {
-  console.log(history.location.pathname);
-  const classes = useStyles();
-
   return (
     <AppBar position='static'>
       <Toolbar>
@@ -59,7 +46,10 @@ const Menu = withRouter(({ history }) => {
           <span>
             <Link to={`/user/${auth.isAuthenticated().user._id}`}>
               <Button
-                style={isActive(history, `/user/${auth.isAuthenticated().user_id}`)}
+                style={isActive(
+                  history,
+                  `/user/${auth.isAuthenticated().user._id}`
+                )}
               >
                 My Profile
               </Button>
