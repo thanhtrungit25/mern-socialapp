@@ -21,6 +21,7 @@ import DeleteUser from './DeleteUser';
 import FollowProfileButton from './FollowProfileButton';
 import FollowGrid from './FollowGrid';
 import ProfileTabs from './ProfileTabs';
+import FindPeople from './FindPeople';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -154,6 +155,7 @@ const Profile = ({ match }) => {
         <Divider />
         <ProfileTabs user={values.user} />
       </List>
+      <FindPeople />
     </Paper>
   );
 };

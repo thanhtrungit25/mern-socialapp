@@ -178,6 +178,21 @@ const removeFollower = async (req, res, next) => {
   }
 };
 
+const findPeople = async (req, res, next) => {
+  let following = req.profile.following;
+  following.push(req.profile._id);
+
+  try {
+    const users = await User.find({ _id: { $nin: following } }).select('name');
+    res.json(users);
+  } catch (error) {
+    console.error(error);
+    return res.status(400).json({
+      error: errorHandler.getErrorMessage(error),
+    });
+  }
+};
+
 export default {
   create,
   list,
@@ -191,4 +206,5 @@ export default {
   addFollower,
   removeFollowing,
   removeFollower,
+  findPeople,
 };
