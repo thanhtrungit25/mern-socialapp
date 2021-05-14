@@ -6,6 +6,7 @@ import cors from 'cors';
 import template from '../template';
 import userRoutes from './routes/user.routes';
 import authRoutes from './routes/auth.routes';
+import postRoutes from './routes/post.routes';
 
 // modules for server side renderin
 import React from 'react';
@@ -42,6 +43,7 @@ app.use(cors());
 // mount routes
 app.use('/', authRoutes);
 app.use('/', userRoutes);
+app.use('/', postRoutes);
 
 app.get('*', (req, res) => {
   // 1. Generate CSS styles using Material-UI's ServerStyleSheets

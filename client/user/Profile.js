@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from 'react';
 import {
   Avatar,
   Divider,
@@ -10,16 +11,16 @@ import {
   Paper,
   Typography,
 } from '@material-ui/core';
+import { Link } from 'react-router-dom';
 import { Edit } from '@material-ui/icons';
-import React, { useEffect, useState } from 'react';
 import { Redirect } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
-import auth from '../auth/auth-helper';
-import { Link } from 'react-router-dom';
 import { read } from './api-user';
+import { listByUser } from '../post/api-post';
+import auth from '../auth/auth-helper';
+
 import DeleteUser from './DeleteUser';
 import FollowProfileButton from './FollowProfileButton';
-import FollowGrid from './FollowGrid';
 import ProfileTabs from './ProfileTabs';
 import FindPeople from './FindPeople';
 
@@ -49,6 +50,7 @@ const Profile = ({ match }) => {
     redirectToSignIn: false,
     following: false,
   });
+  const [posts, setPosts] = useState([]);
   const jwt = auth.isAuthenticated();
 
   useEffect(() => {
@@ -67,6 +69,8 @@ const Profile = ({ match }) => {
       } else {
         let following = checkFollow(data);
         setValues({ ...values, user: data, following: following });
+
+        loadPosts(data._id);
       }
     });
 
@@ -106,6 +110,24 @@ const Profile = ({ match }) => {
     });
   };
 
+  const loadPosts = (userId) => {
+    listByUser(
+      {
+        userId: userId,
+      },
+      {
+        t: jwt.token,
+      }
+    ).then((data) => {
+      console.log('🐈', data);
+      if (data.error) {
+        console.log(data.error);
+      } else {
+        setPosts(data);
+      }
+    });
+  };
+
   if (values.redirectToSignIn) {
     return <Redirect to='/signin' />;
   }
@@ -114,6 +136,7 @@ const Profile = ({ match }) => {
     ? `/api/users/photo/${values.user._id}?${new Date().getTime()}`
     : '/api/users/defaultphoto';
 
+  console.log('😽', posts);
   return (
     <Paper elevation={4} className={classes.root}>
       <Typography variant='h6' className={classes.title}>
@@ -153,7 +176,7 @@ const Profile = ({ match }) => {
           />
         </ListItem>
         <Divider />
-        <ProfileTabs user={values.user} />
+        <ProfileTabs user={values.user} posts={posts} />
       </List>
       <FindPeople />
     </Paper>
