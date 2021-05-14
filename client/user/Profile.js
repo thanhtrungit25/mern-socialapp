@@ -18,6 +18,7 @@ import auth from '../auth/auth-helper';
 import { Link } from 'react-router-dom';
 import { read } from './api-user';
 import DeleteUser from './DeleteUser';
+import FollowProfileButton from './FollowProfileButton';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -40,13 +41,16 @@ const useStyles = makeStyles((theme) => ({
 
 const Profile = ({ match }) => {
   const classes = useStyles();
-  const [user, setUser] = useState({});
-  const [redirectToSignIn, setRedirectToSignIn] = useState(false);
+  const [values, setValues] = useState({
+    user: { following: [], followers: [] },
+    redirectToSignIn: false,
+    following: false,
+  });
+  const jwt = auth.isAuthenticated();
 
   useEffect(() => {
     const abortController = new AbortController();
     const signal = abortController.signal;
-    const jwt = auth.isAuthenticated();
 
     read(
       {
@@ -56,9 +60,10 @@ const Profile = ({ match }) => {
       signal
     ).then((data) => {
       if (data && data.error) {
-        setRedirectToSignIn(true);
+        setValues({ ...values, redirectToSignIn: true });
       } else {
-        setUser(data);
+        let following = checkFollow(data);
+        setValues({ ...values, user: data, following: following });
       }
     });
 
@@ -67,14 +72,43 @@ const Profile = ({ match }) => {
     };
   }, [match.params.userId]);
 
-  if (redirectToSignIn) {
+  const checkFollow = (user) => {
+    const match = user.followers.some((follower) => {
+      return follower._id == jwt.user._id;
+    });
+    return match;
+  };
+
+  const clickFollowButton = (callApi) => {
+    callApi(
+      {
+        userId: jwt.user._id,
+      },
+      {
+        t: jwt.token,
+      },
+      values.user._id
+    ).then((data) => {
+      if (data.error) {
+        console.log(data.error);
+        setValues({ ...values, error: data.error });
+      } else {
+        setValues({
+          ...values,
+          error: '',
+          user: data,
+          following: !values.following,
+        });
+      }
+    });
+  };
+
+  if (values.redirectToSignIn) {
     return <Redirect to='/signin' />;
   }
 
-  console.log(user);
-
-  const photoUrl = user._id
-    ? `/api/users/photo/${user._id}?${new Date().getTime()}`
+  const photoUrl = values.user._id
+    ? `/api/users/photo/${values.user._id}?${new Date().getTime()}`
     : '/api/users/defaultphoto';
 
   return (
@@ -87,24 +121,32 @@ const Profile = ({ match }) => {
           <ListItemAvatar>
             <Avatar src={photoUrl} className={classes.bigAvatar} />
           </ListItemAvatar>
-          <ListItemText primary={user.name} secondary={user.email} />
+          <ListItemText
+            primary={values.user.name}
+            secondary={values.user.email}
+          />
           {auth.isAuthenticated().user &&
-            auth.isAuthenticated().user._id == user._id && (
-              <ListItemSecondaryAction>
-                <Link to={'/user/edit/' + user._id}>
-                  <IconButton aria-label='Edit' color='primary'>
-                    <Edit />
-                  </IconButton>
-                </Link>
-                <DeleteUser userId={user._id} />
-              </ListItemSecondaryAction>
-            )}
+          auth.isAuthenticated().user._id == values.user._id ? (
+            <ListItemSecondaryAction>
+              <Link to={'/user/edit/' + values.user._id}>
+                <IconButton aria-label='Edit' color='primary'>
+                  <Edit />
+                </IconButton>
+              </Link>
+              <DeleteUser userId={values.user._id} />
+            </ListItemSecondaryAction>
+          ) : (
+            <FollowProfileButton
+              onButtonClick={clickFollowButton}
+              following={values.following}
+            />
+          )}
         </ListItem>
         <Divider />
         <ListItem>
           <ListItemText
-            primary={user.about}
-            secondary={'Joined ' + new Date(user.created).toDateString()}
+            primary={values.user.about}
+            secondary={'Joined ' + new Date(values.user.created).toDateString()}
           />
         </ListItem>
       </List>

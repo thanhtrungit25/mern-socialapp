@@ -116,6 +116,7 @@ const addFollowing = async (req, res, next) => {
     });
     next();
   } catch (error) {
+    console.error(error);
     return res.status(400).json({
       error: errorHandler.getErrorMessage(error),
     });
