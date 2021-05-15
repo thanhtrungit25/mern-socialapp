@@ -110,6 +110,7 @@ export default function NewPost(props) {
             placeholder='Share your thoughts...'
             multiline
             rows='3'
+            value={values.text}
             margin='normal'
             className={classes.textField}
             onChange={handleChange('text')}

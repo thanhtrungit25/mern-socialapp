@@ -35,12 +35,18 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Home = () => {
+const Home = ({ history }) => {
   const classes = useStyles();
   const [defaultPage, setDefaultPage] = useState(false);
 
   useEffect(() => {
     setDefaultPage(auth.isAuthenticated());
+    const unlisten = history.listen(() => {
+      setDefaultPage(auth.isAuthenticated());
+    });
+    return () => {
+      unlisten();
+    };
   }, []);
 
   console.log('🐈', defaultPage);

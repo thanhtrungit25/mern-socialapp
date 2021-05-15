@@ -57,7 +57,7 @@ const Newsfeed = () => {
   const removePost = (post) => {
     const updatedPosts = [...posts];
     const index = updatedPosts.indexOf(post);
-    updatedPosts.slice(index, 1);
+    updatedPosts.splice(index, 1);
     setPosts(updatedPosts);
   };
 

@@ -88,10 +88,109 @@ const photo = (req, res, next) => {
   return res.send(req.post.photo.data);
 };
 
+const like = async (req, res, next) => {
+  try {
+    let result = await Post.findByIdAndUpdate(
+      req.body.postId,
+      { $push: { likes: req.body.userId } },
+      { new: true }
+    );
+    console.log('😆 like result', result);
+    res.json(result);
+  } catch (error) {
+    return res.status(400).json({
+      error: errorHandler.getErrorMessage(error),
+    });
+  }
+};
+
+const unlike = async (req, res, next) => {
+  try {
+    let result = await Post.findByIdAndUpdate(
+      req.body.postId,
+      { $pull: { likes: req.body.userId } },
+      { new: true }
+    );
+    res.json(result);
+  } catch (error) {
+    return res.status(400).json({
+      error: errorHandler.getErrorMessage(error),
+    });
+  }
+};
+
+const comment = async (req, res, next) => {
+  let comment = req.body.comment;
+  comment.postedBy = req.body.userId;
+  try {
+    let result = await Post.findByIdAndUpdate(
+      req.body.postId,
+      { $push: { comments: comment } },
+      { new: true }
+    )
+      .populate('comments.postedBy', '_id name')
+      .populate('postedBy', '_id name')
+      .exec();
+    console.log('🐕 🦊', comment);
+    res.json(result);
+  } catch (error) {
+    return res.status(400).json({
+      error: errorHandler.getErrorMessage(error),
+    });
+  }
+};
+
+const uncomment = async (req, res, next) => {
+  let comment = req.body.comment;
+  try {
+    let result = await Post.findByIdAndUpdate(
+      req.body.postId,
+      { $pull: { comments: { _id: comment._id } } },
+      { new: true }
+    )
+      .populate('comments.postedBy', '_id name')
+      .populate('postedBy', '_id name')
+      .exec();
+    res.json(result);
+  } catch (error) {
+    return res.status(400).json({
+      error: errorHandler.getErrorMessage(error),
+    });
+  }
+};
+
+const isPoster = (req, res, next) => {
+  let isPoster = req.auth && req.post && req.post.postedBy._id && req.auth._id;
+  if (!isPoster) {
+    return res.status(403).json({
+      error: 'User is not authorized',
+    });
+  }
+  next();
+};
+
+const remove = async (req, res) => {
+  let post = req.post;
+  try {
+    let deletedPost = await post.remove();
+    res.json(deletedPost);
+  } catch (error) {
+    return res.status(400).json({
+      error: errorHandler.getErrorMessage(err),
+    });
+  }
+};
+
 export default {
   listNewsFeed,
   listByUser,
   create,
   photo,
   postByID,
+  comment,
+  uncomment,
+  isPoster,
+  remove,
+  like,
+  unlike,
 };
